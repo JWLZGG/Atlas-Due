@@ -17,6 +17,11 @@ export function SearchCard({
             >
                 Enter a Solana wallet address
             </label>
+
+            <p className="mb-3 text-xs text-slate-500">
+                Use a sample wallet for this preview build.
+            </p>
+
             <input
                 id="wallet"
                 type="text"

@@ -14,10 +14,10 @@ export function AnalysisPanel({ analysis }: AnalysisPanelProps) {
                             Analysis summary
                         </p>
                         <h2 className="mt-1 text-2xl font-semibold text-slate-900">
-                            {analysis.label ?? "Wallet analysis"}
+                            {analysis.summary.label ?? "Wallet analysis"}
                         </h2>
                         <p className="mt-2 text-sm text-slate-500">
-                            {analysis.walletAddress}
+                            {analysis.summary.walletAddress}
                         </p>
                     </div>
 
@@ -25,11 +25,14 @@ export function AnalysisPanel({ analysis }: AnalysisPanelProps) {
                         <p className="text-xs uppercase tracking-wide text-slate-300">
                             Score
                         </p>
-                        <p className="text-2xl font-semibold">{analysis.score}</p>
+                        <p className="text-2xl font-semibold">{analysis.summary.score}</p>
+                        <p className="text-xs text-slate-300">{analysis.summary.scoreLabel}</p>
                     </div>
                 </div>
 
-                <p className="text-base leading-7 text-slate-700">{analysis.summary}</p>
+                <p className="text-base leading-7 text-slate-700">
+                    {analysis.summary.overview}
+                </p>
             </div>
 
             <div className="grid gap-6 md:grid-cols-2">
@@ -40,7 +43,7 @@ export function AnalysisPanel({ analysis }: AnalysisPanelProps) {
 
                     {analysis.flags.length === 0 ? (
                         <p className="text-sm text-slate-600">
-                            No major risk flags detected in this mock scenario.
+                            No major risk flags detected in this scenario.
                         </p>
                     ) : (
                         <div className="space-y-3">
@@ -66,31 +69,11 @@ export function AnalysisPanel({ analysis }: AnalysisPanelProps) {
 
                 <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                     <h3 className="mb-4 text-lg font-semibold text-slate-900">
-                        Activity snapshot
+                        Recent activity
                     </h3>
-
-                    <dl className="space-y-3 text-sm text-slate-700">
-                        <div className="flex justify-between gap-4">
-                            <dt>Total transactions</dt>
-                            <dd className="font-medium">{analysis.activity.totalTransactions}</dd>
-                        </div>
-                        <div className="flex justify-between gap-4">
-                            <dt>Active days</dt>
-                            <dd className="font-medium">{analysis.activity.activeDays}</dd>
-                        </div>
-                        <div className="flex justify-between gap-4">
-                            <dt>Unique counterparties</dt>
-                            <dd className="font-medium">
-                                {analysis.activity.uniqueCounterparties}
-                            </dd>
-                        </div>
-                        <div className="flex justify-between gap-4">
-                            <dt>Latest activity</dt>
-                            <dd className="font-medium">
-                                {analysis.activity.latestActivityAt ?? "N/A"}
-                            </dd>
-                        </div>
-                    </dl>
+                    <p className="text-sm leading-7 text-slate-700">
+                        {analysis.recentActivitySummary}
+                    </p>
                 </div>
             </div>
 
@@ -103,7 +86,8 @@ export function AnalysisPanel({ analysis }: AnalysisPanelProps) {
                             <tr>
                                 <th className="pb-3 pr-6 font-medium">Asset</th>
                                 <th className="pb-3 pr-6 font-medium">Amount</th>
-                                <th className="pb-3 font-medium">Estimated USD</th>
+                                <th className="pb-3 pr-6 font-medium">Estimated USD</th>
+                                <th className="pb-3 font-medium">Concentration</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -113,14 +97,29 @@ export function AnalysisPanel({ analysis }: AnalysisPanelProps) {
                                         {holding.symbol}
                                     </td>
                                     <td className="py-3 pr-6 text-slate-700">{holding.amount}</td>
+                                    <td className="py-3 pr-6 text-slate-700">
+                                        ${holding.usdValue.toLocaleString()}
+                                    </td>
                                     <td className="py-3 text-slate-700">
-                                        {holding.usdValue ? `$${holding.usdValue.toLocaleString()}` : "—"}
+                                        {holding.concentrationPct.toFixed(1)}%
                                     </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
                 </div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h3 className="mb-4 text-lg font-semibold text-slate-900">
+                    Recommended next checks
+                </h3>
+
+                <ul className="list-disc space-y-2 pl-5 text-sm leading-7 text-slate-700">
+                    {analysis.recommendedNextChecks.map((check, index) => (
+                        <li key={index}>{check}</li>
+                    ))}
+                </ul>
             </div>
         </section>
     );

@@ -1,4 +1,12 @@
+"use client";
+
+import { useState } from "react";
+import { SearchCard } from "@/components/SearchCard";
+import { SAMPLE_WALLETS } from "@/lib/constants";
+
 export default function Home() {
+  const [walletAddress, setWalletAddress] = useState("");
+
   return (
     <main className="min-h-screen bg-white text-slate-900">
       <div className="mx-auto flex max-w-4xl flex-col px-6 py-20">
@@ -11,54 +19,29 @@ export default function Home() {
           </h1>
           <p className="max-w-2xl text-lg leading-8 text-slate-600">
             A diligence and trust layer for digital assets — analyse wallets,
-            surface risk signals, generate concise memos and anchor review
+            surface risk signals, generate concise memos, and anchor review
             records onchain.
           </p>
         </header>
 
-        <section className="mb-10 rounded-2xl border border-slate-200 bg-slate-50 p-6 shadow-sm">
-          <label
-            htmlFor="wallet"
-            className="mb-2 block text-sm font-medium text-slate-700"
-          >
-            Enter a Solana wallet address
-          </label>
-          <input
-            id="wallet"
-            type="text"
-            placeholder="Paste wallet address here"
-            className="mb-4 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none ring-0 placeholder:text-slate-400 focus:border-slate-500"
-          />
-
-          <button
-            type="button"
-            className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-700"
-          >
-            Analyze
-          </button>
-        </section>
+        <SearchCard
+          walletAddress={walletAddress}
+          onWalletAddressChange={setWalletAddress}
+        />
 
         <section className="mb-10">
           <h2 className="mb-3 text-xl font-semibold">Sample wallets</h2>
           <div className="flex flex-wrap gap-3">
-            <button
-              type="button"
-              className="rounded-full border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
-            >
-              Low-risk example
-            </button>
-            <button
-              type="button"
-              className="rounded-full border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
-            >
-              Moderate-risk example
-            </button>
-            <button
-              type="button"
-              className="rounded-full border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
-            >
-              Elevated-risk example
-            </button>
+            {SAMPLE_WALLETS.map((wallet) => (
+              <button
+                key={wallet.label}
+                type="button"
+                onClick={() => setWalletAddress(wallet.address)}
+                className="rounded-full border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
+              >
+                {wallet.label}
+              </button>
+            ))}
           </div>
         </section>
 

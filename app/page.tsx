@@ -2,10 +2,41 @@
 
 import { useState } from "react";
 import { SearchCard } from "@/components/SearchCard";
+import { AnalysisPanel } from "@/components/AnalysisPanel";
 import { SAMPLE_WALLETS } from "@/lib/constants";
+import { mockAnalysisResults } from "@/lib/mock-analysis";
+import type { AnalysisResult } from "@/types/analysis";
+
+function getMockAnalysis(walletAddress: string): AnalysisResult | null {
+  if (walletAddress === SAMPLE_WALLETS[0].address) {
+    return mockAnalysisResults.low;
+  }
+
+  if (walletAddress === SAMPLE_WALLETS[1].address) {
+    return mockAnalysisResults.moderate;
+  }
+
+  if (walletAddress === SAMPLE_WALLETS[2].address) {
+    return mockAnalysisResults.elevated;
+  }
+
+  return null;
+}
 
 export default function Home() {
   const [walletAddress, setWalletAddress] = useState("");
+  const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
+
+  const handleAnalyze = () => {
+    const result = getMockAnalysis(walletAddress);
+    setAnalysis(result);
+  };
+
+  const handleSelectSampleWallet = (address: string) => {
+    setWalletAddress(address);
+    const result = getMockAnalysis(address);
+    setAnalysis(result);
+  };
 
   return (
     <main className="min-h-screen bg-white text-slate-900">
@@ -27,6 +58,7 @@ export default function Home() {
         <SearchCard
           walletAddress={walletAddress}
           onWalletAddressChange={setWalletAddress}
+          onAnalyze={handleAnalyze}
         />
 
         <section className="mb-10">
@@ -36,7 +68,7 @@ export default function Home() {
               <button
                 key={wallet.label}
                 type="button"
-                onClick={() => setWalletAddress(wallet.address)}
+                onClick={() => handleSelectSampleWallet(wallet.address)}
                 className="rounded-full border border-slate-300 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50"
               >
                 {wallet.label}
@@ -45,7 +77,15 @@ export default function Home() {
           </div>
         </section>
 
-        <footer className="mt-auto pt-10 text-sm text-slate-500">
+        {analysis ? (
+          <AnalysisPanel analysis={analysis} />
+        ) : (
+          <section className="mt-4 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-6 text-sm text-slate-600">
+            No analysis loaded yet. Choose a sample wallet or paste an address and click Analyze.
+          </section>
+        )}
+
+        <footer className="mt-12 pt-10 text-sm text-slate-500">
           Solana-native diligence infrastructure
         </footer>
       </div>

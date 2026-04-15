@@ -1,11 +1,13 @@
 type SearchCardProps = {
     walletAddress: string;
     onWalletAddressChange: (value: string) => void;
+    onAnalyze: () => void;
 };
 
 export function SearchCard({
     walletAddress,
     onWalletAddressChange,
+    onAnalyze,
 }: SearchCardProps) {
     return (
         <section className="mb-10 rounded-2xl border border-slate-200 bg-slate-50 p-6 shadow-sm">
@@ -26,6 +28,7 @@ export function SearchCard({
 
             <button
                 type="button"
+                onClick={onAnalyze}
                 className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-700"
             >
                 Analyze

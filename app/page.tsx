@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { SearchCard } from "@/components/SearchCard";
 import { AnalysisPanel } from "@/components/AnalysisPanel";
+import { MemoPanel } from "@/components/MemoPanel";
 import { SAMPLE_WALLETS } from "@/lib/constants";
 import { mockAnalysisResults } from "@/lib/mock-analysis";
 import type { AnalysisResult } from "@/types/analysis";
@@ -26,16 +27,19 @@ function getMockAnalysis(walletAddress: string): AnalysisResult | null {
 export default function Home() {
   const [walletAddress, setWalletAddress] = useState("");
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
+  const [showMemo, setShowMemo] = useState(false);
 
   const handleAnalyze = () => {
     const result = getMockAnalysis(walletAddress);
     setAnalysis(result);
+    setShowMemo(false);
   };
 
   const handleSelectSampleWallet = (address: string) => {
     setWalletAddress(address);
     const result = getMockAnalysis(address);
     setAnalysis(result);
+    setShowMemo(false);
   };
 
   return (
@@ -78,7 +82,21 @@ export default function Home() {
         </section>
 
         {analysis ? (
-          <AnalysisPanel analysis={analysis} />
+          <>
+            <AnalysisPanel analysis={analysis} />
+
+            <section className="mt-8">
+              <button
+                type="button"
+                onClick={() => setShowMemo((prev) => !prev)}
+                className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-700"
+              >
+                {showMemo ? "Hide memo" : "Generate memo"}
+              </button>
+            </section>
+
+            {showMemo ? <MemoPanel analysis={analysis} /> : null}
+          </>
         ) : (
           <section className="mt-4 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-6 text-sm text-slate-600">
             No analysis loaded yet. Choose a sample wallet or paste an address and click Analyze.

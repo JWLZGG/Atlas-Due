@@ -1,26 +1,20 @@
 # Atlas Due
 
-Atlas Due is a Solana-native trust and diligence layer for stablecoin settlement, treasury, and payment counterparties.
+**Atlas Due** is a Solana-native trust and diligence layer for stablecoin settlement, treasury, and payment counterparties.
 
 ## One-line pitch
 
-Atlas Due helps platforms and treasury teams assess Solana settlement wallets, surface key risk signals, generate concise review memos, and anchor review records onchain.
+Atlas Due helps platforms and treasury teams assess Solana settlement wallets, surface key risk signals, generate concise review memos, and prepare review records for onchain attestation.
+
+## Why this matters
+
+Stablecoin and treasury workflows increasingly depend on wallet-level trust decisions. Today, those reviews are often fragmented across block explorers, screenshots, spreadsheets, and internal notes.
+
+Atlas Due turns wallet review into a structured workflow and a portable diligence artifact.
 
 ## Core workflow
 
 **Wallet input → analysis → review memo → onchain attestation**
-
-## Why it exists
-
-Stablecoin and treasury workflows increasingly rely on wallet-level trust decisions, but those reviews are still fragmented across block explorers, screenshots, spreadsheets, and internal notes.
-
-Atlas Due turns wallet review into a structured diligence workflow and a portable trust artifact.
-
-## Current status
-
-Atlas Due is in active build for **Solana Colosseum Frontier 2026**.
-
-This repository represents a focused MVP being built for hackathon judging and post-hackathon startup development.
 
 ## What works today
 
@@ -30,16 +24,18 @@ This repository represents a focused MVP being built for hackathon judging and p
 - recent transaction signature summary
 - review memo generation
 - deterministic memo hash
+- printable memo flow
+- attestation workflow placeholder
 
 ## MVP scope
 
 The current MVP is focused on a narrow but valuable workflow:
 
 - input a Solana wallet address
-- analyze holdings and activity
+- analyze holdings and recent activity
 - surface deterministic and early live risk signals
 - generate a concise review memo
-- anchor a review record on Solana Devnet
+- prepare a review record for Solana Devnet attestation
 
 ### Included in v1
 
@@ -72,6 +68,22 @@ Atlas Due is being designed for:
 - stablecoin settlement workflows
 - platforms onboarding payout or settlement wallets
 
+## Why Solana
+
+Atlas Due is built around Solana for two reasons:
+
+1. **Wallet-native financial context**  
+   Solana provides the wallet-level activity and holdings data needed for settlement and treasury review.
+
+2. **Portable review artifacts**  
+   Atlas Due is designed to turn wallet review into an onchain-attestable artifact, rather than leaving diligence trapped in PDFs and internal notes.
+
+## Current status
+
+Atlas Due is in active build for **Solana Colosseum Frontier 2026**.
+
+This repository represents a focused MVP being built for hackathon judging and post-hackathon startup development.
+
 ## Planned architecture
 
 - **Next.js frontend**
@@ -80,10 +92,9 @@ Atlas Due is being designed for:
 - **memo generation layer**
 - **Anchor-based Solana attestation program**
 
-## Near-term repository structure
+## Repository structure
 
 ```text
-
 atlas-due/
   app/
   components/
@@ -97,39 +108,49 @@ atlas-due/
   FOUNDER_FIT.md
   MARKET_THESIS.md
   SUBMISSION_CHECKLIST.md
+  ```
 
-```
+### Architecture notes
 
-### Notes on architecture direction
-
-```text
 ## Longer-term target modules include:
 
 components/ — reusable UI components
-lib/ — helpers, constants, and app logic
+lib/ — helpers, constants, analysis logic, and Solana utilities
 types/ — shared TypeScript types
 prisma/ — database schema and migrations
 scripts/ — seed and demo helper scripts
-```
 
 ## A later monorepo structure may include:
 
-```text
 packages/shared
 packages/risk-engine
 packages/memo
 packages/solana-client
 programs/atlas_due
-Local setup
-```
+What judges should look at first
+
+## If you are reviewing this repo for the hackathon, the most important places to start are:
+
+app/page.tsx — main user flow
+app/api/analyze/route.ts — mock + live analysis entry point
+components/AnalysisPanel.tsx — analysis presentation layer
+components/MemoPanel.tsx — memo artifact layer
+lib/solana.ts — live wallet and recent-activity reads
+lib/build-review-memo.ts — memo construction and hashing
+
+### Local setup
 
 ## Install dependencies:
 
+```text
 npm install
+```
 
 Run the development server:
 
+```text
 npm run dev
+```
 
 Open:
 
@@ -139,14 +160,19 @@ http://localhost:3000
 
 ## This repo is being built as a focused MVP for:
 
-```text
 Solana Colosseum Frontier 2026
 post-hackathon product refinement
 potential pre-seed and ecosystem fundraising
-```
+Roadmap
+
+### Near-term next steps:
+
+deeper live transaction analysis
+wallet age and activity heuristics
+richer live risk scoring
+Solana Devnet review attestation
+cleaner memo export flow
 
 ### License
 
-```text
 TBD
-```

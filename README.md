@@ -8,7 +8,7 @@ Atlas Due helps platforms and treasury teams assess Solana settlement wallets, s
 
 ## Core workflow
 
-**Wallet input → analysis → memo → onchain attestation**
+**Wallet input → analysis → review memo → onchain attestation**
 
 ## Why it exists
 
@@ -22,25 +22,38 @@ Atlas Due is in active build for **Solana Colosseum Frontier 2026**.
 
 This repository represents a focused MVP being built for hackathon judging and post-hackathon startup development.
 
+## What works today
+
+- sample wallet demo scenarios
+- live Solana wallet preview
+- live holdings table with concentration percentages
+- recent transaction signature summary
+- review memo generation
+- deterministic memo hash
+
 ## MVP scope
 
 The current MVP is focused on a narrow but valuable workflow:
 
 - input a Solana wallet address
 - analyze holdings and activity
-- surface deterministic risk flags
+- surface deterministic and early live risk signals
 - generate a concise review memo
 - anchor a review record on Solana Devnet
 
 ### Included in v1
+
 - wallet input
 - analysis dashboard
 - deterministic risk flags
 - simple score
-- memo page
-- onchain review attestation
+- review memo page
+- memo hash generation
+- early live wallet preview
+- onchain review attestation placeholder
 
 ### Excluded from v1
+
 - multichain support
 - merchant checkout flow
 - Visa/card integrations
@@ -86,25 +99,26 @@ atlas-due/
 
 ## Notes on architecture direction
 
+```text
 Longer-term target modules include:
 
-- components/ — reusable UI components
-- lib/ — helpers, constants, and app logic
-- types/ — shared TypeScript types
-- prisma/ — database schema and migrations
-- scripts/ — seed and demo helper scripts
+components/ — reusable UI components
+lib/ — helpers, constants, and app logic
+types/ — shared TypeScript types
+prisma/ — database schema and migrations
+scripts/ — seed and demo helper scripts
 
 A later monorepo structure may include:
 
-- packages/shared
-- packages/risk-engine
-- packages/memo
-- packages/solana-client
-- programs/atlas_due
+```text
+packages/shared
+packages/risk-engine
+packages/memo
+packages/solana-client
+programs/atlas_due
+Local setup
 
-## Local setup
-
-Install dependencies:
+## Install dependencies:
 
 npm install
 
@@ -116,16 +130,16 @@ Open:
 
 http://localhost:3000
 
-## Submission context
+### Submission context
 
-This repo is being built as a focused MVP for:
+## This repo is being built as a focused MVP for:
 
+```text
 Solana Colosseum Frontier 2026
 post-hackathon product refinement
 potential pre-seed and ecosystem fundraising
 
-## License
+### License
 
+```text
 TBD
-
-

@@ -4,17 +4,23 @@ import { useEffect, useState } from "react";
 import { SearchCard } from "@/components/SearchCard";
 import { AnalysisPanel } from "@/components/AnalysisPanel";
 import { MemoPanel } from "@/components/MemoPanel";
+import { ReviewStatusSelector } from "@/components/ReviewStatusSelector";
 import { buildReviewMemo } from "@/lib/build-review-memo";
+import { buildAttestationPayload } from "@/lib/build-attestation-payload";
 import { SAMPLE_WALLETS } from "@/lib/constants";
-import type { AnalysisResult } from "@/types/analysis";
+import type { AnalysisResult, ReviewStatus } from "@/types/analysis";
 import type { ReviewMemo } from "@/types/memo";
+import type { AttestationPayload } from "@/types/attestation";
 
 export default function Home() {
   const [walletAddress, setWalletAddress] = useState("");
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [memoState, setMemoState] = useState<ReviewMemo | null>(null);
+  const [memo, setMemo] = useState<ReviewMemo | null>(null);
+  const [reviewStatus, setReviewStatus] = useState<ReviewStatus>("pending");
+  const [attestationPayload, setAttestationPayload] =
+    useState<AttestationPayload | null>(null);
 
   const handleAnalyze = async () => {
     const trimmedWallet = walletAddress.trim();
@@ -96,14 +102,14 @@ export default function Home() {
 
     async function generateMemo() {
       if (!analysis) {
-        setMemoState(null);
+        setMemo(null);
         return;
       }
 
       const nextMemo = await buildReviewMemo(analysis);
 
       if (!isCancelled) {
-        setMemoState(nextMemo);
+        setMemo(nextMemo);
       }
     }
 
@@ -113,6 +119,16 @@ export default function Home() {
       isCancelled = true;
     };
   }, [analysis]);
+
+  useEffect(() => {
+    if (!memo) {
+      setAttestationPayload(null);
+      return;
+    }
+
+    const payload = buildAttestationPayload(memo, reviewStatus);
+    setAttestationPayload(payload);
+  }, [memo, reviewStatus]);
 
   return (
     <main className="min-h-screen bg-white text-slate-900">
@@ -139,8 +155,8 @@ export default function Home() {
 
         <section className="mb-10 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
           <p className="text-sm text-slate-600">
-            <span className="font-medium text-slate-900">Flow:</span> Wallet input →
-            Analysis → Review memo → Onchain attestation
+            <span className="font-medium text-slate-900">Flow:</span> Wallet
+            input → Analysis → Review memo → Onchain attestation
           </p>
         </section>
 
@@ -164,7 +180,16 @@ export default function Home() {
         {analysis ? (
           <>
             <AnalysisPanel analysis={analysis} />
-            {memoState ? <MemoPanel memo={memoState} /> : null}
+            <ReviewStatusSelector
+              value={reviewStatus}
+              onChange={setReviewStatus}
+            />
+            {memo ? (
+              <MemoPanel
+                memo={memo}
+                attestationPayload={attestationPayload}
+              />
+            ) : null}
           </>
         ) : errorMessage ? (
           <section className="mt-4 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-6 text-sm text-slate-600">

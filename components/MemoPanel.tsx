@@ -1,10 +1,12 @@
+import type { AttestationPayload } from "@/types/attestation";
 import type { ReviewMemo } from "@/types/memo";
 
 type MemoPanelProps = {
     memo: ReviewMemo;
+    attestationPayload?: AttestationPayload | null;
 };
 
-export function MemoPanel({ memo }: MemoPanelProps) {
+export function MemoPanel({ memo, attestationPayload }: MemoPanelProps) {
     return (
         <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm print:shadow-none">
             <div className="mb-6 border-b border-slate-200 pb-4">
@@ -53,6 +55,17 @@ export function MemoPanel({ memo }: MemoPanelProps) {
                     {memo.memoHash}
                 </p>
             </div>
+
+            {attestationPayload ? (
+                <div className="mb-6">
+                    <p className="text-xs uppercase tracking-wide text-slate-500">
+                        Attestation payload preview
+                    </p>
+                    <pre className="mt-2 overflow-x-auto rounded-xl border border-slate-200 bg-slate-50 p-3 text-xs text-slate-700">
+                        {JSON.stringify(attestationPayload, null, 2)}
+                    </pre>
+                </div>
+            ) : null}
 
             <div className="mb-6">
                 <h3 className="mb-3 text-lg font-semibold text-slate-900">

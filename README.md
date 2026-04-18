@@ -83,6 +83,7 @@ Atlas Due is being designed for:
 ## Near-term repository structure
 
 ```text
+
 atlas-due/
   app/
   components/
@@ -97,18 +98,21 @@ atlas-due/
   MARKET_THESIS.md
   SUBMISSION_CHECKLIST.md
 
-## Notes on architecture direction
+```
+
+### Notes on architecture direction
 
 ```text
-Longer-term target modules include:
+## Longer-term target modules include:
 
 components/ — reusable UI components
 lib/ — helpers, constants, and app logic
 types/ — shared TypeScript types
 prisma/ — database schema and migrations
 scripts/ — seed and demo helper scripts
+```
 
-A later monorepo structure may include:
+## A later monorepo structure may include:
 
 ```text
 packages/shared
@@ -117,6 +121,7 @@ packages/memo
 packages/solana-client
 programs/atlas_due
 Local setup
+```
 
 ## Install dependencies:
 
@@ -138,8 +143,10 @@ http://localhost:3000
 Solana Colosseum Frontier 2026
 post-hackathon product refinement
 potential pre-seed and ecosystem fundraising
+```
 
 ### License
 
 ```text
 TBD
+```

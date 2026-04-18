@@ -4,6 +4,7 @@ import { mockAnalysisResults } from "@/lib/mock-analysis";
 import {
     addConcentrationPercentages,
     buildRecentActivitySnapshot,
+    deriveActivityHeuristics,
     formatRecentActivitySummary,
     getLiveHoldings,
     getRecentSignatures,
@@ -19,7 +20,15 @@ function buildLiveAnalysis(
         usdValue: number;
         concentrationPct: number;
     }>,
-    recentActivitySummary: string
+    recentActivitySummary: string,
+    activityHeuristics: {
+        signatureCount: number;
+        hasRecentActivity: boolean;
+        isSparseWindow: boolean;
+        isDenseWindow: boolean;
+        isHighlyClustered: boolean;
+        windowSpanSeconds: number | null;
+    }
 ): AnalysisResult {
     const topHolding = holdings[0];
     const holdingsCount = holdings.length;
@@ -59,6 +68,25 @@ function buildLiveAnalysis(
                 "A large share of visible value appears concentrated in a single holding, which may reduce flexibility and increase risk.",
         });
     }
+
+    if (activityHeuristics.isHighlyClustered) {
+        score -= 6;
+
+        flags.push({
+            code: "ERRATIC_SETTLEMENT_FLOW",
+            title: "Tightly clustered recent activity",
+            severity: "medium",
+            explanation:
+                "Recent visible transaction activity appears tightly clustered in a short time window. Additional flow review is recommended.",
+        });
+
+        overview =
+            "This early live preview suggests a concentrated activity window alongside the current holdings profile. Additional flow review is recommended.";
+    } else if (activityHeuristics.isSparseWindow) {
+        score -= 3;
+    }
+
+    score = Math.max(0, Math.min(100, score));
 
     return {
         summary: {
@@ -124,11 +152,13 @@ export async function POST(req: Request) {
 
         const activitySnapshot = buildRecentActivitySnapshot(signatures);
         const recentActivitySummary = formatRecentActivitySummary(activitySnapshot);
+        const activityHeuristics = deriveActivityHeuristics(activitySnapshot);
 
         const liveAnalysis = buildLiveAnalysis(
             walletAddress,
             holdings,
-            recentActivitySummary
+            recentActivitySummary,
+            activityHeuristics
         );
 
         return NextResponse.json(liveAnalysis);

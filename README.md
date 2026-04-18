@@ -1,10 +1,10 @@
 # Atlas Due
 
-**Atlas Due** is a Solana-native trust and diligence layer for stablecoin settlement, treasury, and payment counterparties.
+**Atlas Due** is a Solana-native trust and diligence layer for stablecoin settlement, treasury and payment counterparties.
 
 ## One-line pitch
 
-Atlas Due helps platforms and treasury teams assess Solana settlement wallets, surface key risk signals, generate concise review memos, and prepare review records for onchain attestation.
+Atlas Due helps platforms and treasury teams assess Solana settlement wallets, surface key risk signals, generate concise review memos and prepare review records for onchain attestation.
 
 ## Why this matters
 
@@ -110,9 +110,9 @@ atlas-due/
   SUBMISSION_CHECKLIST.md
   ```
 
-### Architecture notes
+## Architecture notes
 
-## Longer-term target modules include:
+### Longer-term target modules include:
 
 components/ — reusable UI components
 lib/ — helpers, constants, analysis logic, and Solana utilities
@@ -120,7 +120,7 @@ types/ — shared TypeScript types
 prisma/ — database schema and migrations
 scripts/ — seed and demo helper scripts
 
-## A later monorepo structure may include:
+### A later monorepo structure may include:
 
 packages/shared
 packages/risk-engine
@@ -138,9 +138,9 @@ components/MemoPanel.tsx — memo artifact layer
 lib/solana.ts — live wallet and recent-activity reads
 lib/build-review-memo.ts — memo construction and hashing
 
-### Local setup
+## Local setup
 
-## Install dependencies:
+### Install dependencies:
 
 ```text
 npm install
@@ -156,16 +156,16 @@ Open:
 
 http://localhost:3000
 
-### Submission context
+## Submission context
 
-## This repo is being built as a focused MVP for:
+### This repo is being built as a focused MVP for:
 
 Solana Colosseum Frontier 2026
 post-hackathon product refinement
 potential pre-seed and ecosystem fundraising
 Roadmap
 
-### Near-term next steps:
+## Near-term next steps:
 
 deeper live transaction analysis
 wallet age and activity heuristics
@@ -173,6 +173,6 @@ richer live risk scoring
 Solana Devnet review attestation
 cleaner memo export flow
 
-### License
+## License
 
 TBD

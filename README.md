@@ -1,36 +1,131 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Atlas Due
 
-## Getting Started
+Atlas Due is a Solana-native trust and diligence layer for stablecoin settlement, treasury, and payment counterparties.
 
-First, run the development server:
+## One-line pitch
 
-```bash
+Atlas Due helps platforms and treasury teams assess Solana settlement wallets, surface key risk signals, generate concise review memos, and anchor review records onchain.
+
+## Core workflow
+
+**Wallet input → analysis → memo → onchain attestation**
+
+## Why it exists
+
+Stablecoin and treasury workflows increasingly rely on wallet-level trust decisions, but those reviews are still fragmented across block explorers, screenshots, spreadsheets, and internal notes.
+
+Atlas Due turns wallet review into a structured diligence workflow and a portable trust artifact.
+
+## Current status
+
+Atlas Due is in active build for **Solana Colosseum Frontier 2026**.
+
+This repository represents a focused MVP being built for hackathon judging and post-hackathon startup development.
+
+## MVP scope
+
+The current MVP is focused on a narrow but valuable workflow:
+
+- input a Solana wallet address
+- analyze holdings and activity
+- surface deterministic risk flags
+- generate a concise review memo
+- anchor a review record on Solana Devnet
+
+### Included in v1
+- wallet input
+- analysis dashboard
+- deterministic risk flags
+- simple score
+- memo page
+- onchain review attestation
+
+### Excluded from v1
+- multichain support
+- merchant checkout flow
+- Visa/card integrations
+- full compliance suite
+- portfolio tracking
+- alerts and notifications
+- enterprise user management
+- broad AI agent workflows
+
+## Who it is for
+
+Atlas Due is being designed for:
+
+- treasury teams
+- payment operators
+- stablecoin settlement workflows
+- platforms onboarding payout or settlement wallets
+
+## Planned architecture
+
+- **Next.js frontend**
+- **TypeScript application layer**
+- **deterministic risk engine**
+- **memo generation layer**
+- **Anchor-based Solana attestation program**
+
+## Near-term repository structure
+
+```text
+atlas-due/
+  app/
+  components/
+  lib/
+  types/
+  prisma/
+  scripts/
+  public/
+  README.md
+  SPEC.md
+  FOUNDER_FIT.md
+  MARKET_THESIS.md
+  SUBMISSION_CHECKLIST.md
+
+## Notes on architecture direction
+
+Longer-term target modules include:
+
+- components/ — reusable UI components
+- lib/ — helpers, constants, and app logic
+- types/ — shared TypeScript types
+- prisma/ — database schema and migrations
+- scripts/ — seed and demo helper scripts
+
+A later monorepo structure may include:
+
+- packages/shared
+- packages/risk-engine
+- packages/memo
+- packages/solana-client
+- programs/atlas_due
+
+## Local setup
+
+Install dependencies:
+
+npm install
+
+Run the development server:
+
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+http://localhost:3000
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Submission context
 
-## Learn More
+This repo is being built as a focused MVP for:
 
-To learn more about Next.js, take a look at the following resources:
+Solana Colosseum Frontier 2026
+post-hackathon product refinement
+potential pre-seed and ecosystem fundraising
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## License
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+TBD
 
-## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.

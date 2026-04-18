@@ -16,9 +16,17 @@ export function AnalysisPanel({ analysis }: AnalysisPanelProps) {
                         <h2 className="mt-1 text-2xl font-semibold text-slate-900">
                             {analysis.summary.label ?? "Wallet analysis"}
                         </h2>
-                        <p className="mt-2 text-sm text-slate-500">
-                            {analysis.summary.walletAddress}
-                        </p>
+                        <div className="mt-2 flex flex-wrap items-center gap-2">
+                            <p className="text-sm text-slate-500 break-all">
+                                {analysis.summary.walletAddress}
+                            </p>
+
+                            {analysis.summary.label === "Live wallet preview" ? (
+                                <span className="rounded-full border border-blue-200 bg-blue-50 px-2 py-1 text-xs font-medium uppercase tracking-wide text-blue-700">
+                                    Live preview
+                                </span>
+                            ) : null}
+                        </div>
                     </div>
 
                     <div className="rounded-xl bg-slate-900 px-4 py-3 text-white">
@@ -86,7 +94,7 @@ export function AnalysisPanel({ analysis }: AnalysisPanelProps) {
                             <tr>
                                 <th className="pb-3 pr-6 font-medium">Asset</th>
                                 <th className="pb-3 pr-6 font-medium">Amount</th>
-                                <th className="pb-3 pr-6 font-medium">Estimated USD</th>
+                                <th className="pb-3 pr-6 font-medium">Value proxy</th>
                                 <th className="pb-3 font-medium">Concentration</th>
                             </tr>
                         </thead>
@@ -96,9 +104,11 @@ export function AnalysisPanel({ analysis }: AnalysisPanelProps) {
                                     <td className="py-3 pr-6 font-medium text-slate-900">
                                         {holding.symbol}
                                     </td>
-                                    <td className="py-3 pr-6 text-slate-700">{holding.amount}</td>
                                     <td className="py-3 pr-6 text-slate-700">
-                                        ${holding.usdValue.toLocaleString()}
+                                        {holding.amount.toLocaleString()}
+                                    </td>
+                                    <td className="py-3 pr-6 text-slate-700">
+                                        ${holding.usdValue.toLocaleString(undefined, { maximumFractionDigits: 3 })}
                                     </td>
                                     <td className="py-3 text-slate-700">
                                         {holding.concentrationPct.toFixed(1)}%

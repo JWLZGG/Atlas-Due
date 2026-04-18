@@ -11,15 +11,15 @@ export const REVIEW_STATUSES: ReviewStatus[] = [
 
 export const SAMPLE_WALLETS = [
     {
-        label: "Low-risk example",
+        label: "Low-risk settlement wallet",
         address: "DemoLowRiskWallet111111111111111111111111111",
     },
     {
-        label: "Moderate-risk example",
+        label: "Moderate-risk treasury wallet",
         address: "DemoModerateRiskWallet11111111111111111111",
     },
     {
-        label: "Elevated-risk example",
+        label: "Elevated-risk counterparty wallet",
         address: "DemoElevatedRiskWallet11111111111111111111",
     },
 ];

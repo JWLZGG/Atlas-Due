@@ -1,96 +1,126 @@
-import type { AnalysisResult } from "@/types/analysis";
+import type { ReviewMemo } from "@/types/memo";
 
 type MemoPanelProps = {
-    analysis: AnalysisResult;
+    memo: ReviewMemo;
 };
 
-export function MemoPanel({ analysis }: MemoPanelProps) {
+export function MemoPanel({ memo }: MemoPanelProps) {
     return (
-        <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <div className="mb-6 flex items-start justify-between gap-4">
+        <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm print:shadow-none">
+            <div className="mb-6 border-b border-slate-200 pb-4">
+                <p className="text-sm uppercase tracking-wide text-slate-500">
+                    Review memo
+                </p>
+                <h2 className="mt-1 text-2xl font-semibold text-slate-900">
+                    {memo.label ?? memo.title}
+                </h2>
+                <p className="mt-2 break-all text-sm text-slate-500">
+                    {memo.subjectWallet}
+                </p>
+                <p className="mt-3 text-sm leading-6 text-slate-600">
+                    This memo summarizes wallet-level risk signals, recent activity
+                    context, and recommended next checks for treasury, settlement, or
+                    payment-counterparty review.
+                </p>
+            </div>
+
+            <div className="mb-6 grid gap-4 md:grid-cols-2">
                 <div>
-                    <p className="text-sm uppercase tracking-wide text-slate-500">
-                        Diligence memo
+                    <p className="text-xs uppercase tracking-wide text-slate-500">
+                        Score
                     </p>
-                    <h2 className="mt-1 text-2xl font-semibold text-slate-900">
-                        {analysis.summary.label ?? "Wallet review memo"}
-                    </h2>
-                    <p className="mt-2 text-sm text-slate-500">
-                        {analysis.summary.walletAddress}
+                    <p className="mt-1 text-2xl font-semibold text-slate-900">
+                        {memo.score}
                     </p>
+                    <p className="text-sm text-slate-600">{memo.scoreLabel}</p>
                 </div>
 
-                <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-right">
+                <div>
                     <p className="text-xs uppercase tracking-wide text-slate-500">
-                        Diligence score
+                        Summary
                     </p>
-                    <p className="text-xl font-semibold text-slate-900">
-                        {analysis.summary.score}
-                    </p>
-                    <p className="text-xs text-slate-600">
-                        {analysis.summary.scoreLabel}
+                    <p className="mt-1 text-sm leading-7 text-slate-700">
+                        {memo.summary}
                     </p>
                 </div>
             </div>
 
-            <div className="space-y-6 text-sm leading-7 text-slate-700">
-                <section>
-                    <h3 className="mb-2 text-base font-semibold text-slate-900">
-                        1. Executive overview
-                    </h3>
-                    <p>{analysis.summary.overview}</p>
-                </section>
+            <div className="mb-6">
+                <p className="text-xs uppercase tracking-wide text-slate-500">
+                    Memo hash
+                </p>
+                <p className="mt-2 break-all rounded-xl border border-slate-200 bg-slate-50 p-3 font-mono text-xs text-slate-700">
+                    {memo.memoHash}
+                </p>
+            </div>
 
-                <section>
-                    <h3 className="mb-2 text-base font-semibold text-slate-900">
-                        2. Key risk flags
-                    </h3>
-                    {analysis.flags.length === 0 ? (
-                        <p>No major risk flags were triggered in this scenario.</p>
-                    ) : (
-                        <ul className="list-disc space-y-2 pl-5">
-                            {analysis.flags.map((flag) => (
-                                <li key={flag.code}>
-                                    <span className="font-medium text-slate-900">{flag.title}:</span>{" "}
+            <div className="mb-6">
+                <h3 className="mb-3 text-lg font-semibold text-slate-900">
+                    Key flags
+                </h3>
+
+                {memo.flags.length === 0 ? (
+                    <p className="text-sm text-slate-600">
+                        No major flags were identified in this review scenario.
+                    </p>
+                ) : (
+                    <ul className="space-y-3">
+                        {memo.flags.map((flag) => (
+                            <li
+                                key={flag.code}
+                                className="rounded-xl border border-slate-200 bg-slate-50 p-4"
+                            >
+                                <div className="mb-1 flex items-center justify-between gap-3">
+                                    <p className="font-medium text-slate-900">{flag.title}</p>
+                                    <span className="rounded-full border border-slate-300 px-2 py-1 text-xs uppercase tracking-wide text-slate-600">
+                                        {flag.severity}
+                                    </span>
+                                </div>
+                                <p className="text-sm leading-6 text-slate-600">
                                     {flag.explanation}
-                                </li>
-                            ))}
-                        </ul>
-                    )}
-                </section>
-
-                <section>
-                    <h3 className="mb-2 text-base font-semibold text-slate-900">
-                        3. Recent activity summary
-                    </h3>
-                    <p>{analysis.recentActivitySummary}</p>
-                </section>
-
-                <section>
-                    <h3 className="mb-2 text-base font-semibold text-slate-900">
-                        4. Holdings snapshot
-                    </h3>
-                    <ul className="list-disc space-y-1 pl-5">
-                        {analysis.holdings.map((holding) => (
-                            <li key={holding.symbol}>
-                                <span className="font-medium">{holding.symbol}</span> —{" "}
-                                {holding.amount} (~${holding.usdValue.toLocaleString()},{" "}
-                                {holding.concentrationPct.toFixed(1)}%)
+                                </p>
                             </li>
                         ))}
                     </ul>
-                </section>
+                )}
+            </div>
 
-                <section>
-                    <h3 className="mb-2 text-base font-semibold text-slate-900">
-                        5. Recommended next checks
-                    </h3>
-                    <ul className="list-disc space-y-1 pl-5">
-                        {analysis.recommendedNextChecks.map((check, index) => (
-                            <li key={index}>{check}</li>
-                        ))}
-                    </ul>
-                </section>
+            <div className="mb-6">
+                <h3 className="mb-3 text-lg font-semibold text-slate-900">
+                    Recent activity summary
+                </h3>
+                <p className="text-sm leading-7 text-slate-700">
+                    {memo.recentActivitySummary}
+                </p>
+            </div>
+
+            <div className="mb-6">
+                <h3 className="mb-3 text-lg font-semibold text-slate-900">
+                    Recommended next checks
+                </h3>
+                <ul className="list-disc space-y-2 pl-5 text-sm leading-7 text-slate-700">
+                    {memo.recommendedNextChecks.map((check, index) => (
+                        <li key={index}>{check}</li>
+                    ))}
+                </ul>
+            </div>
+
+            <div className="mt-6 flex flex-wrap gap-3 print:hidden">
+                <button
+                    type="button"
+                    onClick={() => window.print()}
+                    className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                >
+                    Print memo
+                </button>
+
+                <button
+                    type="button"
+                    disabled
+                    className="rounded-xl bg-slate-200 px-4 py-2 text-sm font-medium text-slate-500"
+                >
+                    Attest review (coming soon)
+                </button>
             </div>
         </section>
     );

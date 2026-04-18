@@ -2,13 +2,17 @@ type SearchCardProps = {
     walletAddress: string;
     onWalletAddressChange: (value: string) => void;
     onAnalyze: () => void;
+    isLoading: boolean;
 };
 
 export function SearchCard({
     walletAddress,
     onWalletAddressChange,
     onAnalyze,
+    isLoading,
 }: SearchCardProps) {
+    const isDisabled = walletAddress.trim().length === 0 || isLoading;
+
     return (
         <section className="mb-10 rounded-2xl border border-slate-200 bg-slate-50 p-6 shadow-sm">
             <label
@@ -19,9 +23,8 @@ export function SearchCard({
             </label>
 
             <p className="mb-3 text-xs text-slate-500">
-                Use a sample wallet for this preview build.
+                Use a sample wallet for fixed demo scenarios, or paste a real Solana wallet address to try the live preview.
             </p>
-
             <input
                 id="wallet"
                 type="text"
@@ -34,9 +37,10 @@ export function SearchCard({
             <button
                 type="button"
                 onClick={onAnalyze}
-                className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-700"
+                disabled={isDisabled}
+                className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-300"
             >
-                Analyze
+                {isLoading ? "Analyzing..." : "Analyze"}
             </button>
         </section>
     );

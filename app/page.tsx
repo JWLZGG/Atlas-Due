@@ -1,13 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { WalletConnectButton } from "@/components/WalletConnectButton";
+
 import { SearchCard } from "@/components/SearchCard";
 import { AnalysisPanel } from "@/components/AnalysisPanel";
-import { MemoPanel } from "@/components/MemoPanel";
 import { ReviewStatusSelector } from "@/components/ReviewStatusSelector";
+import { AttestationAction } from "@/components/AttestationAction";
+import { MemoPanel } from "@/components/MemoPanel";
+
+import { SAMPLE_WALLETS } from "@/lib/constants";
 import { buildReviewMemo } from "@/lib/build-review-memo";
 import { buildAttestationPayload } from "@/lib/build-attestation-payload";
-import { SAMPLE_WALLETS } from "@/lib/constants";
+
 import type { AnalysisResult, ReviewStatus } from "@/types/analysis";
 import type { ReviewMemo } from "@/types/memo";
 import type { AttestationPayload } from "@/types/attestation";
@@ -15,18 +20,41 @@ import type { AttestationPayload } from "@/types/attestation";
 export default function Home() {
   const [walletAddress, setWalletAddress] = useState("");
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [memo, setMemo] = useState<ReviewMemo | null>(null);
   const [reviewStatus, setReviewStatus] = useState<ReviewStatus>("pending");
   const [attestationPayload, setAttestationPayload] =
     useState<AttestationPayload | null>(null);
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  async function fetchAnalysis(address: string) {
+    const response = await fetch("/api/analyze", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ walletAddress: address }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.error ?? "No analysis is available for this wallet yet."
+      );
+    }
+
+    return data as AnalysisResult;
+  }
 
   const handleAnalyze = async () => {
     const trimmedWallet = walletAddress.trim();
 
     if (!trimmedWallet) {
       setAnalysis(null);
+      setMemo(null);
+      setAttestationPayload(null);
       setErrorMessage("Please enter a wallet address.");
       return;
     }
@@ -35,28 +63,17 @@ export default function Home() {
     setErrorMessage(null);
 
     try {
-      const response = await fetch("/api/analyze", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ walletAddress: trimmedWallet }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setAnalysis(null);
-        setErrorMessage(
-          data.error ?? "No mock analysis is available for this wallet yet."
-        );
-        return;
-      }
-
-      setAnalysis(data);
-    } catch {
+      const nextAnalysis = await fetchAnalysis(trimmedWallet);
+      setAnalysis(nextAnalysis);
+    } catch (error) {
       setAnalysis(null);
-      setErrorMessage("Something went wrong while analyzing this wallet.");
+      setMemo(null);
+      setAttestationPayload(null);
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong while analyzing this wallet."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -65,33 +82,23 @@ export default function Home() {
   const handleSelectSampleWallet = async (address: string) => {
     setWalletAddress(address);
     setAnalysis(null);
+    setMemo(null);
+    setAttestationPayload(null);
     setErrorMessage(null);
-
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/analyze", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ walletAddress: address }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        setAnalysis(null);
-        setErrorMessage(
-          data.error ?? "No mock analysis is available for this wallet yet."
-        );
-        return;
-      }
-
-      setAnalysis(data);
-    } catch {
+      const nextAnalysis = await fetchAnalysis(address);
+      setAnalysis(nextAnalysis);
+    } catch (error) {
       setAnalysis(null);
-      setErrorMessage("Something went wrong while loading the sample wallet.");
+      setMemo(null);
+      setAttestationPayload(null);
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "Something went wrong while loading the sample wallet."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -132,18 +139,25 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-white text-slate-900">
-      <div className="mx-auto flex max-w-4xl flex-col px-6 py-20">
-        <header className="mb-12">
-          <p className="mb-3 text-sm font-medium uppercase tracking-wider text-slate-500">
-            Solana-native trust infrastructure
-          </p>
-          <h1 className="mb-4 text-5xl font-semibold tracking-tight">
-            Atlas Due
-          </h1>
-          <p className="max-w-2xl text-lg leading-8 text-slate-600">
-            Assess Solana settlement wallets, surface key risk signals, generate
-            concise review memos, and anchor review records onchain.
-          </p>
+      <div className="mx-auto flex max-w-5xl flex-col px-6 py-16">
+        <header className="mb-10">
+          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <p className="mb-3 text-sm font-medium uppercase tracking-wider text-slate-500">
+                Solana-native trust infrastructure
+              </p>
+              <h1 className="mb-4 text-5xl font-semibold tracking-tight">
+                Atlas Due
+              </h1>
+              <p className="max-w-2xl text-lg leading-8 text-slate-600">
+                Assess Solana settlement wallets, surface key risk signals,
+                generate concise review memos, and anchor review records
+                onchain.
+              </p>
+            </div>
+
+            <WalletConnectButton />
+          </div>
         </header>
 
         <SearchCard
@@ -180,10 +194,14 @@ export default function Home() {
         {analysis ? (
           <>
             <AnalysisPanel analysis={analysis} />
+
             <ReviewStatusSelector
               value={reviewStatus}
               onChange={setReviewStatus}
             />
+
+            <AttestationAction payload={attestationPayload} />
+
             {memo ? (
               <MemoPanel
                 memo={memo}

@@ -20,12 +20,16 @@ Atlas Due turns wallet review into a structured workflow and a portable diligenc
 
 - sample wallet demo scenarios
 - live Solana wallet preview
-- live holdings table with concentration percentages
+- holdings table with concentration percentages
 - recent transaction signature summary
+- deterministic and live risk signals
 - review memo generation
 - deterministic memo hash
 - printable memo flow
-- attestation workflow placeholder
+- wallet connection and message signing
+- Devnet memo attestation
+- deployed Anchor program for PDA-backed review records
+- create, update and fetch flow for onchain review records
 
 ## MVP scope
 
@@ -46,7 +50,9 @@ The current MVP is focused on a narrow but valuable workflow:
 - review memo page
 - memo hash generation
 - early live wallet preview
-- onchain review attestation placeholder
+- wallet connection and message signing
+- Devnet memo attestation
+- PDA-backed onchain review records on Solana Devnet
 
 ### Excluded from v1
 

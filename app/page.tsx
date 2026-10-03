@@ -1,7 +1,15 @@
 "use client";
 
+import Link from "next/link";
+import { TransferContextForm } from "@/components/TransferContextForm";
+import type {
+  TransferContext,
+  ReviewDecision,
+  SavedReview,
+} from "@/types/review";
 import { useEffect, useState } from "react";
 import { WalletConnectButton } from "@/components/WalletConnectButton";
+import { DecisionPanel } from "@/components/DecisionPanel";
 
 import { SearchCard } from "@/components/SearchCard";
 import { AnalysisPanel } from "@/components/AnalysisPanel";
@@ -19,6 +27,28 @@ import type { AttestationPayload } from "@/types/attestation";
 
 export default function Home() {
   const [walletAddress, setWalletAddress] = useState("");
+  const [transferContext, setTransferContext] =
+    useState<TransferContext>({
+      counterpartyLabel: "",
+      asset: "USDC",
+      amount: "",
+      purpose: "",
+    });
+  const [decision, setDecision] =
+    useState<ReviewDecision | null>(null);
+
+  const [rationale, setRationale] = useState("");
+
+  const [expiresAt, setExpiresAt] = useState("");
+
+  const [savedReview, setSavedReview] =
+    useState<SavedReview | null>(null);
+
+  const [isSavingReview, setIsSavingReview] =
+    useState(false);
+
+  const [saveReviewError, setSaveReviewError] =
+    useState<string | null>(null);
   const [analysis, setAnalysis] = useState<AnalysisResult | null>(null);
   const [memo, setMemo] = useState<ReviewMemo | null>(null);
   const [reviewStatus, setReviewStatus] = useState<ReviewStatus>("pending");
@@ -137,6 +167,92 @@ export default function Home() {
     setAttestationPayload(payload);
   }, [memo, reviewStatus]);
 
+  async function handleSaveReview() {
+    if (!analysis) {
+      setSaveReviewError("Analyze the recipient before saving a review.");
+      return;
+    }
+
+    if (!transferContext.counterpartyLabel.trim()) {
+      setSaveReviewError("Enter a counterparty label.");
+      return;
+    }
+
+    if (!transferContext.asset.trim()) {
+      setSaveReviewError("Enter an asset.");
+      return;
+    }
+
+    if (!transferContext.amount.trim()) {
+      setSaveReviewError("Enter an amount.");
+      return;
+    }
+
+    if (!transferContext.purpose.trim()) {
+      setSaveReviewError("Enter a payment purpose.");
+      return;
+    }
+
+    if (!decision) {
+      setSaveReviewError("Select approve, reject, or escalate.");
+      return;
+    }
+
+    if (!rationale.trim()) {
+      setSaveReviewError("Enter a rationale for the decision.");
+      return;
+    }
+
+    if (decision === "approved" && !expiresAt) {
+      setSaveReviewError("Approved reviews require an expiry date.");
+      return;
+    }
+
+    setIsSavingReview(true);
+    setSaveReviewError(null);
+
+    try {
+      const response = await fetch("/api/reviews", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          recipientAddress: analysis.summary.walletAddress,
+          counterpartyLabel:
+            transferContext.counterpartyLabel.trim(),
+          asset: transferContext.asset.trim(),
+          amount: transferContext.amount.trim(),
+          purpose: transferContext.purpose.trim(),
+
+          analysis,
+
+          decision,
+          rationale: rationale.trim(),
+          expiresAt: expiresAt || null,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.error ?? "Failed to save review."
+        );
+      }
+
+      setSavedReview(data.review);
+    } catch (error) {
+      setSaveReviewError(
+        error instanceof Error
+          ? error.message
+          : "Failed to save review."
+      );
+    } finally {
+      setIsSavingReview(false);
+    }
+  }
+
   return (
     <main className="min-h-screen bg-white text-slate-900">
       <div className="mx-auto flex max-w-5xl flex-col px-6 py-16">
@@ -160,11 +276,41 @@ export default function Home() {
           </div>
         </header>
 
-        <SearchCard
-          walletAddress={walletAddress}
-          onWalletAddressChange={setWalletAddress}
-          onAnalyze={handleAnalyze}
-          isLoading={isLoading}
+        <div className="mt-6 mb-6 flex flex-wrap gap-3">
+          <a
+            href="#review-workflow"
+            className="rounded-xl bg-slate-900 px-4 py-3 text-sm font-medium text-white"
+          >
+            New recipient review
+          </a>
+
+          <Link
+            href="/registry"
+            className="rounded-xl border border-slate-300 px-4 py-3 text-sm font-medium text-slate-700"
+          >
+            View registry
+          </Link>
+
+          <Link
+            href="/precheck-demo"
+            className="rounded-xl border border-slate-300 px-4 py-3 text-sm font-medium text-slate-700"
+          >
+            Precheck API demo
+          </Link>
+        </div>
+
+        <div id="review-workflow">
+          <SearchCard
+            walletAddress={walletAddress}
+            onWalletAddressChange={setWalletAddress}
+            onAnalyze={handleAnalyze}
+            isLoading={isLoading}
+          />
+        </div>
+
+        <TransferContextForm
+          value={transferContext}
+          onChange={setTransferContext}
         />
 
         <section className="mb-10 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -194,6 +340,45 @@ export default function Home() {
         {analysis ? (
           <>
             <AnalysisPanel analysis={analysis} />
+
+            <DecisionPanel
+              decision={decision}
+              rationale={rationale}
+              expiresAt={expiresAt}
+              onDecisionChange={setDecision}
+              onRationaleChange={setRationale}
+              onExpiresAtChange={setExpiresAt}
+              onSave={handleSaveReview}
+              isSaving={isSavingReview}
+              saveError={saveReviewError}
+            />
+
+            {savedReview ? (
+              <section className="mt-8 rounded-2xl border border-emerald-200 bg-emerald-50 p-6">
+                <p className="text-sm font-medium uppercase tracking-wide text-emerald-700">
+                  Review saved
+                </p>
+
+                <h2 className="mt-1 text-xl font-semibold text-emerald-950">
+                  {savedReview.decision}
+                </h2>
+
+                <p className="mt-3 text-sm text-emerald-900">
+                  Review ID: {savedReview.id}
+                </p>
+
+                <p className="mt-1 text-sm text-emerald-900">
+                  Policy: {savedReview.policyVersion}
+                </p>
+
+                {savedReview.expiresAt ? (
+                  <p className="mt-1 text-sm text-emerald-900">
+                    Expires:{" "}
+                    {new Date(savedReview.expiresAt).toLocaleDateString()}
+                  </p>
+                ) : null}
+              </section>
+            ) : null}
 
             <ReviewStatusSelector
               value={reviewStatus}

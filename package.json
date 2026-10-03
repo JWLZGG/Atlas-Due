@@ -11,6 +11,7 @@
   "dependencies": {
     "@anchor-lang/core": "^1.0.2",
     "@hookform/resolvers": "^5.2.2",
+    "@prisma/adapter-better-sqlite3": "^7.10.0",
     "@prisma/client": "^7.7.0",
     "@solana-program/memo": "^0.11.0",
     "@solana/wallet-adapter-react": "^0.15.39",
@@ -22,6 +23,7 @@
     "bs58": "^6.0.0",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
+    "dotenv": "^18.0.5",
     "jspdf": "^4.2.1",
     "lucide-react": "^1.8.0",
     "next": "^16.2.3",
@@ -38,6 +40,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/better-sqlite3": "^9.6.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
@@ -46,6 +49,7 @@
     "prettier": "^3.8.3",
     "prisma": "^7.7.0",
     "tailwindcss": "^4.2.2",
+    "tsx": "^4.23.15",
     "turbo": "^2.9.6",
     "typescript": "^5.9.3"
   }

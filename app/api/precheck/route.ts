@@ -1,43 +1,49 @@
 import { NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import prisma from "@/lib/prisma";
 
-export async function POST(req: Request) {
+const DEMO_API_KEY = "atlas_due_demo_key";
+
+export async function POST(request: Request) {
     try {
-        const auth = req.headers.get("authorization");
+        const auth = request.headers.get("authorization");
         const token = auth?.replace("Bearer ", "");
 
-        if (!token) {
+        if (token !== DEMO_API_KEY) {
             return NextResponse.json(
                 {
                     status: "review_required",
-                    reason: "Missing workspace API key",
+                    reason: "Missing or invalid workspace API key.",
                 },
                 { status: 401 }
             );
         }
 
         const workspace = await prisma.workspace.findUnique({
-            where: { apiKey: token },
+            where: {
+                apiKey: DEMO_API_KEY,
+            },
         });
 
         if (!workspace) {
             return NextResponse.json(
                 {
                     status: "review_required",
-                    reason: "Invalid workspace API key",
+                    reason: "Workspace not found.",
                 },
-                { status: 401 }
+                { status: 500 }
             );
         }
 
-        const body = await req.json();
+        const body = await request.json();
+
         const { chain, recipientAddress, asset, purpose } = body;
 
         if (!chain || !recipientAddress || !asset || !purpose) {
             return NextResponse.json(
                 {
                     status: "review_required",
-                    reason: "Missing required precheck fields",
+                    reason:
+                        "Missing required fields. chain, recipientAddress, asset and purpose are required.",
                 },
                 { status: 400 }
             );
@@ -59,7 +65,7 @@ export async function POST(req: Request) {
         if (!latestReview) {
             return NextResponse.json({
                 status: "review_required",
-                reason: "No matching approval record exists",
+                reason: "No matching saved review exists for this payment context.",
             });
         }
 
@@ -68,7 +74,7 @@ export async function POST(req: Request) {
                 status: "blocked",
                 reviewId: latestReview.id,
                 policyVersion: latestReview.policyVersion,
-                reason: "Recipient has an explicit rejection for this context",
+                reason: "Latest matching review explicitly rejected this context.",
             });
         }
 
@@ -77,7 +83,7 @@ export async function POST(req: Request) {
                 status: "review_required",
                 reviewId: latestReview.id,
                 policyVersion: latestReview.policyVersion,
-                reason: "Latest review is not approved",
+                reason: "Latest matching review is not approved.",
             });
         }
 
@@ -86,8 +92,8 @@ export async function POST(req: Request) {
                 status: "review_required",
                 reviewId: latestReview.id,
                 policyVersion: latestReview.policyVersion,
-                expiresAt: latestReview.expiresAt,
-                reason: "Approval has expired",
+                expiresAt: latestReview.expiresAt.toISOString(),
+                reason: "Matching approval has expired.",
             });
         }
 
@@ -95,14 +101,16 @@ export async function POST(req: Request) {
             status: "approved",
             reviewId: latestReview.id,
             policyVersion: latestReview.policyVersion,
-            expiresAt: latestReview.expiresAt,
-            reason: "Current approval matches this recipient and payment context",
+            expiresAt: latestReview.expiresAt?.toISOString() ?? null,
+            reason: "Current saved approval matches this recipient and payment context.",
         });
-    } catch {
+    } catch (error) {
+        console.error("Precheck failed:", error);
+
         return NextResponse.json(
             {
                 status: "review_required",
-                reason: "Precheck failed closed",
+                reason: "Precheck failed closed.",
             },
             { status: 500 }
         );

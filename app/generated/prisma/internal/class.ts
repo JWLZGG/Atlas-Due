@@ -19,8 +19,8 @@ const config: runtime.GetPrismaClientConfig = {
   "previewFeatures": [],
   "clientVersion": "7.7.0",
   "engineVersion": "75cbdc1eb7150937890ad5465d861175c6624711",
-  "activeProvider": "sqlite",
-  "inlineSchema": "generator client {\n  provider = \"prisma-client\"\n  output   = \"../app/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"sqlite\"\n}\n\nmodel Workspace {\n  id        String   @id @default(cuid())\n  name      String\n  apiKey    String   @unique\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  reviews Review[]\n}\n\nmodel Review {\n  id          String @id @default(cuid())\n  workspaceId String\n\n  chain             String @default(\"solana\")\n  recipientAddress  String\n  counterpartyLabel String\n  asset             String\n  amount            String\n  purpose           String\n\n  evidenceJson      String\n  evidenceCheckedAt DateTime\n  evidenceSource    String\n\n  decision      String\n  rationale     String\n  reviewerId    String\n  decidedAt     DateTime\n  expiresAt     DateTime?\n  policyVersion String\n\n  memoHash       String?\n  attestationPda String?\n  attestationTx  String?\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)\n\n  @@index([workspaceId])\n  @@index([recipientAddress])\n  @@index([workspaceId, recipientAddress])\n}\n",
+  "activeProvider": "postgresql",
+  "inlineSchema": "generator client {\n  provider = \"prisma-client\"\n  output   = \"../app/generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n}\n\nmodel Workspace {\n  id        String   @id @default(cuid())\n  name      String\n  apiKey    String   @unique\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  reviews Review[]\n}\n\nmodel Review {\n  id          String @id @default(cuid())\n  workspaceId String\n\n  chain             String @default(\"solana\")\n  recipientAddress  String\n  counterpartyLabel String\n  asset             String\n  amount            String\n  purpose           String\n\n  evidenceJson      String\n  evidenceCheckedAt DateTime\n  evidenceSource    String\n\n  decision      String\n  rationale     String\n  reviewerId    String\n  decidedAt     DateTime\n  expiresAt     DateTime?\n  policyVersion String\n\n  memoHash       String?\n  attestationPda String?\n  attestationTx  String?\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)\n\n  @@index([workspaceId])\n  @@index([recipientAddress])\n  @@index([workspaceId, recipientAddress])\n}\n",
   "runtimeDataModel": {
     "models": {},
     "enums": {},
@@ -45,10 +45,10 @@ async function decodeBase64AsWasm(wasmBase64: string): Promise<WebAssembly.Modul
 }
 
 config.compilerWasm = {
-  getRuntime: async () => await import("@prisma/client/runtime/query_compiler_fast_bg.sqlite.mjs"),
+  getRuntime: async () => await import("@prisma/client/runtime/query_compiler_fast_bg.postgresql.mjs"),
 
   getQueryCompilerWasmModule: async () => {
-    const { wasm } = await import("@prisma/client/runtime/query_compiler_fast_bg.sqlite.wasm-base64.mjs")
+    const { wasm } = await import("@prisma/client/runtime/query_compiler_fast_bg.postgresql.wasm-base64.mjs")
     return await decodeBase64AsWasm(wasm)
   },
 

@@ -6,6 +6,8 @@ import {
     ConfirmedSignatureInfo,
 } from "@solana/web3.js";
 
+import { formatAtlasDateTime } from "@/lib/format-date";
+
 const connection = new Connection(clusterApiUrl("mainnet-beta"), "confirmed");
 
 type LiveHolding = {
@@ -144,52 +146,51 @@ export function formatRecentActivitySummary(
     }
 
     const latest = snapshot.mostRecentBlockTime
-        ? new Date(snapshot.mostRecentBlockTime * 1000).toLocaleString()
+        ? formatAtlasDateTime(snapshot.mostRecentBlockTime * 1000)
         : "unknown";
 
     const oldest = snapshot.oldestFetchedBlockTime
-        ? new Date(snapshot.oldestFetchedBlockTime * 1000).toLocaleString()
+        ? formatAtlasDateTime(snapshot.oldestFetchedBlockTime * 1000)
         : "unknown";
 
     return `Recent live preview includes ${snapshot.signatureCount} fetched transaction signature(s), ranging from ${oldest} to ${latest}. Deeper transaction pattern analysis is planned next.`;
-}
 
-export type ActivityHeuristics = {
-    signatureCount: number;
-    hasRecentActivity: boolean;
-    isSparseWindow: boolean;
-    isDenseWindow: boolean;
-    isHighlyClustered: boolean;
-    windowSpanSeconds: number | null;
-};
-
-export function deriveActivityHeuristics(
-    snapshot: RecentActivitySnapshot
-): ActivityHeuristics {
-    const { signatureCount, mostRecentBlockTime, oldestFetchedBlockTime } = snapshot;
-
-    const hasRecentActivity = signatureCount > 0;
-
-    let windowSpanSeconds: number | null = null;
-    if (
-        mostRecentBlockTime !== null &&
-        oldestFetchedBlockTime !== null &&
-        mostRecentBlockTime >= oldestFetchedBlockTime
-    ) {
-        windowSpanSeconds = mostRecentBlockTime - oldestFetchedBlockTime;
-    }
-
-    const isSparseWindow = signatureCount > 0 && signatureCount <= 2;
-    const isDenseWindow = signatureCount >= 10;
-    const isHighlyClustered =
-        windowSpanSeconds !== null && signatureCount >= 5 && windowSpanSeconds <= 300;
-
-    return {
-        signatureCount,
-        hasRecentActivity,
-        isSparseWindow,
-        isDenseWindow,
-        isHighlyClustered,
-        windowSpanSeconds,
+    export type ActivityHeuristics = {
+        signatureCount: number;
+        hasRecentActivity: boolean;
+        isSparseWindow: boolean;
+        isDenseWindow: boolean;
+        isHighlyClustered: boolean;
+        windowSpanSeconds: number | null;
     };
-}
+
+    export function deriveActivityHeuristics(
+        snapshot: RecentActivitySnapshot
+    ): ActivityHeuristics {
+        const { signatureCount, mostRecentBlockTime, oldestFetchedBlockTime } = snapshot;
+
+        const hasRecentActivity = signatureCount > 0;
+
+        let windowSpanSeconds: number | null = null;
+        if (
+            mostRecentBlockTime !== null &&
+            oldestFetchedBlockTime !== null &&
+            mostRecentBlockTime >= oldestFetchedBlockTime
+        ) {
+            windowSpanSeconds = mostRecentBlockTime - oldestFetchedBlockTime;
+        }
+
+        const isSparseWindow = signatureCount > 0 && signatureCount <= 2;
+        const isDenseWindow = signatureCount >= 10;
+        const isHighlyClustered =
+            windowSpanSeconds !== null && signatureCount >= 5 && windowSpanSeconds <= 300;
+
+        return {
+            signatureCount,
+            hasRecentActivity,
+            isSparseWindow,
+            isDenseWindow,
+            isHighlyClustered,
+            windowSpanSeconds,
+        };
+    }

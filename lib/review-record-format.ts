@@ -1,3 +1,4 @@
+import { formatAtlasDateTime } from "@/lib/format-date";
 import type { OnchainReviewRecord } from "@/types/review-record";
 import type { ReviewStatus } from "@/types/analysis";
 
@@ -23,7 +24,7 @@ export function bytesToHex(bytes: number[] | Uint8Array): string {
 }
 
 export function formatUnixTimestamp(timestamp: number): string {
-    return new Date(timestamp * 1000).toLocaleString();
+    return formatAtlasDateTime(timestamp * 1000);
 }
 
 export function statusLabelFromRecord(record: OnchainReviewRecord): string {
